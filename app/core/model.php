@@ -105,7 +105,7 @@ class model
 
             if(empty($errors))
             {
-                $this->db->execute("INSERT INTO users (login, email, password) VALUES ('".$_POST['login']."','".$_POST['email']."','".md5($_POST['password'])."')");
+                $this->db->execute("INSERT INTO users (name, surname, login, email, password) VALUES ('".$_POST['surname']."','".$_POST['name']."','".$_POST['login']."','".$_POST['email']."','".md5($_POST['password'])."')");
                 echo "<div style='color: green;'>Вы успешно зарегистрированы</div>";
             }
             else
@@ -130,6 +130,8 @@ class model
                     $_SESSION['id'] = $user[0]['id'];
 
                     $_SESSION['user'] = $_POST['login'];
+
+                    $_SESSION['status'] = 'online';
 
                     $_SESSION['new_sms']= $this->new_sms();
                 }
@@ -158,28 +160,34 @@ class model
         {
             $errors[]='Введите email';
         }
+
         if(trim($_POST['login']==''))
         {
             $errors[]='Введите login';
         }
+
         if(trim($_POST['password']=='') )
         {
             $errors[]='Введите password';
         }
+
         if($_POST['password2'] != $_POST['password'])
         {
             $errors[]='Повтормый пароль введен не верно';
         }
+
         if(count($this->db->query("SELECT login FROM users WHERE login='".$_POST['login']."'"))>0)
         {
             $errors[]='Пользователь уже существует';
         }
+
         return $errors;
     }
 
     public function logout()
     {
         unset($_SESSION['user']);
+        unset($_SESSION['status']);
 
         header('Location: /');
     }
@@ -201,9 +209,48 @@ class model
        $this->db->query("SELECT * FROM users ");
     }
 
+    public function friends_id()
+    {
+        return  $this->db->query("SELECT friend_id FROM friends WHERE user_id='".$_SESSION['id']."'");
+
+
+    }
+    public function get_friends()
+    {
+        $friends = $this->friends_id();
+        foreach ($friends as $friend)
+        {
+           $user_login[] =  $this->db->query("SELECT login FROM users WHERE id='".$friend['friend_id']."'");
+            foreach ($user_login as $login){
+
+                $arr[] = $login[0]['login'];
+
+            }
+        }
+     return $arr;
+    }
+
+
+    public function count_sms()
+    {
+        return count($this->db->query("SELECT message FROM messages WHERE to_user=".$_SESSION['id']));
+    }
+
     public function new_sms()
     {
-        $sql = "SELECT flag FROM messages WHERE to_user='".$_SESSION['user']."' AND flag=0";
-        return count($this->db->query($sql));
+        return count($this->db->query("SELECT flag FROM messages WHERE to_user='".$_SESSION['id']."' AND flag=0"));
+    }
+
+    public function add_friend($friend_id)
+    {
+        return $this->db->query("INSERT INTO friends (user_id, friend_id) VALUES ('" .$_SESSION['id']. "','".$friend_id."')" );
+    }
+    public function friend_user_id($friend_id)
+    {
+        return $this->db->query("SELECT img FROM users WHERE id=".$friend_id);
+    }
+    public function select_avatar()
+    {
+        $this->db->query("SELECT img FROM users ");
     }
 }

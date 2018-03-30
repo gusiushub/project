@@ -4,12 +4,14 @@ class model_user extends model
 {
     public function get_users()
     {
-         return $this->db->query("SELECT login,id FROM users ");
+         return $this->db->query("SELECT * FROM users ");
     }
-    public function add_friend($user)
+
+    public function add_friend($friend_id)
     {
-        return$this->db->execute("UPDATE users SET friends='".$user."'");
+        return $this->db->query("INSERT INTO friends (user_id, friend_id) VALUES ('" .$_SESSION['id']. "','".$friend_id."')" );
     }
+
     public function sms()
     {
         /**
@@ -59,15 +61,7 @@ class model_user extends model
          */
          $this->db->query("SELECT id FROM messages");
 
-
-        /**
-         * Достаем сообщение. Помимо номера сообщения ориентируемся и на id пользователя
-         * Это исключит возможность чтения чужого сообщения, методом подбора id сообщения
-         */
-        $sql="select * from messages where to_user = '".$_SESSION['id']."'";//' AND id='".$_GET['mess_id']."'";
-        $res = $this->db->query($sql);
-
-
+        $res = $this->ger_user_sms();
         /**
          * Установим флаг о прочтении сообщения
          */
@@ -84,6 +78,18 @@ class model_user extends model
             $f = $int[0];
             echo '<div>' . $res[$f]['message'] . '</div>Дата отправки: ' . $res[$f]['date'];
         }
+    }
+
+    public function ger_user_sms()
+    {
+        /**
+         * Достаем сообщение. Помимо номера сообщения ориентируемся и на id пользователя
+         * Это исключит возможность чтения чужого сообщения, методом подбора id сообщения
+         */
+        $sql="select * from messages where to_user = '".$_SESSION['id']."'";//' AND id='".$_GET['mess_id']."'";
+        return $this->db->query($sql);
+        //var_dump($u);
+
     }
 
 }
