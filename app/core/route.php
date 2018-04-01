@@ -1,11 +1,14 @@
 <?php
+
  class Route
 {
     static function start()
     {
         // контроллер и действие по умолчанию
         $controller_name = 'main';
+
         $action_name = 'index';
+
         $id = null;
 
         $routes = explode('/', $_SERVER['REQUEST_URI']);
@@ -20,23 +23,28 @@
         if ( !empty($routes[2]) )
         {
             //проверка на число
-            if (preg_match('/^\+?\d+$/', $routes[2])) {
+            if (preg_match('/^\+?\d+$/', $routes[2]))
+            {
                 $_GET['id'] = $routes[2];
-
-            }else {
+            }
+            else
+            {
                 $action_name = $routes[2];
             }
         }
 
         // добавляем префиксы
         $model_name = 'model_'.$controller_name;
+
         $controller_name = 'controller_'.$controller_name;
+
         $action_name = 'action_'.$action_name;
 
         // подцепляем файл с классом модели (файла модели может и не быть)
-
         $model_file = strtolower($model_name).'.php';
+
         $model_path = "app/models/".$model_file;
+
         if(file_exists($model_path))
         {
             include "app/models/".$model_file;
@@ -44,25 +52,21 @@
 
         // подцепляем файл с классом контроллера
         $controller_file = strtolower($controller_name).'.php';
+
         $controller_path = "app/controllers/".$controller_file;
+
         if(file_exists($controller_path))
         {
             include "app/controllers/".$controller_file;
         }
-        else {
-
-                //if(file_exist($admcontroller_path)){
-
-                //}
-                /*
-                правильно было бы кинуть здесь исключение,
-                но для упрощения сразу сделаем редирект на страницу 404
-                */
+        else
+            {
                 Route::ErrorPage404();
             }
 
         // создаем контроллер
         $controller = new $controller_name;
+
         $action = $action_name;
 
         if(method_exists($controller, $action))
@@ -75,14 +79,16 @@
             // здесь также разумнее было бы кинуть исключение
             Route::ErrorPage404();
         }
-
     }
 
     static function ErrorPage404()
     {
         $host = 'http://'.$_SERVER['HTTP_HOST'].'/';
+
         header('HTTP/1.1 404 Not Found');
+
         header("Status: 404 Not Found");
+
         header('Location:'.$host.'404');
     }
 }

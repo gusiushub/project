@@ -1,6 +1,6 @@
 <?php
 
-class controller_adminpenal extends Controller_Admin
+class controller_admin_panel extends Controller_Admin
 {
     function __construct()
     {

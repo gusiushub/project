@@ -18,22 +18,26 @@ class model_user extends model
          * Принимаем постовые данные. Очистим сообщение от html тэгов
          * и приведем id получателя к типу integer
          */
-        if(!empty($_POST['message'])) {
+        if(!empty($_POST['message']))
+        {
             $message = htmlspecialchars($_POST['message']);
         }
-        if(!empty($_POST['to'])) {
+
+        if(!empty($_POST['to']))
+        {
             $to = (int)$_POST['to'];
-            $sql = "INSERT INTO messages (from_user,to_user,message,flag) values
-    ('" . $_SESSION['id'] . "','" . $to . "','" . $message . "','0')";
+
+            $sql = "INSERT INTO messages (from_user,to_user,message,flag) VALUES ('" . $_SESSION['id'] . "','" . $to . "','" . $message . "','0')";
+
             $this->db->query($sql);
         }
     }
 
+    /**
+     * Достаем сообщения
+     */
     public function get_sms()
     {
-        /**
-         * Достаем сообщения
-         */
         echo 'входящие <br>';
         $sth=$this->db->query("SELECT * FROM messages WHERE to_user='".$_SESSION['id']."' ORDER BY id DESC");
         $l = 0;
@@ -41,15 +45,6 @@ class model_user extends model
             $l++;
             echo 'Сообщение №'.$row['id'].'  <a href="/user/message/'.$l.$row["id"].'">Открыть</a><br />';
         }
-
-//        echo 'исходящие  <br>';
-//        $get_sms = $this->db->query("SELECT * FROM messages WHERE from_user='".$_SESSION['id']."' ORDER BY id DESC");
-//        foreach ($get_sms as $row){
-//
-//            echo 'Сообщение №'.$row['id'].'  <a href="/user/message/'.$row[$l."id"].'">Открыть</a><br />';
-//            $l++;
-//        }
-//        $l=0;
     }
 
     public function read_sms()
@@ -65,31 +60,36 @@ class model_user extends model
         /**
          * Установим флаг о прочтении сообщения
          */
-        $sql="update messages set flag = 1 where  to_user = '".$_SESSION['id']."'";// and id = '". $_GET['mess_id']."'";
+        $sql="update messages set flag = 1 where  to_user = '".$_SESSION['id']."'";
+
         $this->db->query($sql);
 
         /**
          * Выводим сообщение с датой отправки
          */
-        if(!empty($uri[3])) {
+        if(!empty($uri[3]))
+        {
             $int = preg_split('//', $uri[3]);
+
             array_pop($int);
+
             array_shift($int);
+
             $f = $int[0];
+
             echo '<div>' . $res[$f]['message'] . '</div>Дата отправки: ' . $res[$f]['date'];
         }
     }
 
+    /**
+     * Достаем сообщение. Помимо номера сообщения ориентируемся и на id пользователя
+     * Это исключит возможность чтения чужого сообщения, методом подбора id сообщения
+     */
     public function ger_user_sms()
     {
-        /**
-         * Достаем сообщение. Помимо номера сообщения ориентируемся и на id пользователя
-         * Это исключит возможность чтения чужого сообщения, методом подбора id сообщения
-         */
-        $sql="select * from messages where to_user = '".$_SESSION['id']."'";//' AND id='".$_GET['mess_id']."'";
-        return $this->db->query($sql);
-        //var_dump($u);
+        $sql="select * from messages where to_user = '".$_SESSION['id']."'";
 
+        return $this->db->query($sql);
     }
 
 }

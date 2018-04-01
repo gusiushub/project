@@ -1,5 +1,7 @@
 <?php
 
+require_once '/../config/file_config.php';
+
 class model
 {
     public $db;
@@ -8,7 +10,6 @@ class model
     public function __construct()
     {
         $this->db = new data_base;
-
     }
 
     public function insert_article()
@@ -17,31 +18,32 @@ class model
     }
 
     /**
+     * Загрузка файла
      * @return string
      */
     public function insert_img($do=null,$db_name=null,$file=null, $directoria=null)
     {
-        if (!empty($_FILES["".$file.""]["name"])) {
-
+        if (!empty($_FILES["".$file.""]["name"]))
+        {
             ini_set('memory_limit', '32M');
 
             $maxsize = "100000000";
 
-            $extentions = array("gif", "txt", "tpl", "jpg", "jpeg", "png", "zip", "rar", "7z", "tif", "psd", "swf", "flv", "avi", "mpeg", "mp4", "mp3", "wav", "ogg", "ogm", "doc", "xls", "ppt");
+            $extentions = file_config::format();
 
             $size = filesize($_FILES["".$file.""]["tmp_name"]);
 
             $type = strtolower(substr($_FILES[$file]["name"], 1 + strrpos($_FILES[$file]["name"], ".")));
 
-            $new_name = "file-" . time() . "." . $type;
+            $new_name= file_config::name($file);
 
             if ($size > $maxsize)
             {
-                echo "Файл больше 100 мб. Уменьшите размер вашего файла или загрузите другой. <br><a href='' onClick=window.close();>Закрыть окно</a>";
+                echo "Файл превышает 100 мб. <br><a href='' onClick=window.close();>Закрыть окно</a>";
             }
             elseif (!in_array($type, $extentions))
             {
-                echo ' <b>Файл имеет недопустимое расширение</b>. Допустимыми являются форматы изображений, видеофайлов, флэш-роликов и текстовых документов. <br>';
+                echo ' <b>Недопустимое расширение</b>.';
             }
             else
                 {
@@ -53,23 +55,29 @@ class model
 
                     $time = date('Y-m-d',time());
 
-                    if($do=='insert')
-                    {
-                        $this->insert_photo($db_name,$_POST['title_text'],$_POST['content'],$_SESSION['user'],$new_name);
+                    $this->operation_check($do,$db_name,$new_name);
 
-                    }
+                    model::redirect('/user');
 
-                    if ($do=='update')
-                    {
-                        $this->update_photo($new_name);
-                    }
-                    ?>
-                    <script type="text/javascript">
-                        window.location.href='/user';
-                    </script>
-                    <?php
-                } else echo "Файл НЕ был загружен.";
+                } else echo 'Файл НЕ загружен.';
             }
+        }
+    }
+
+    /**
+     * узнаем, какая операция
+     * выполняется с бд
+     * */
+    public function operation_check($do=null,$db_name=null,$new_name)
+    {
+        if($do=='insert')
+        {
+            $this->insert_photo($db_name,$_POST['title_text'],$_POST['content'],$_SESSION['user'],$new_name);
+        }
+
+        if ($do=='update')
+        {
+            $this->update_photo($new_name);
         }
     }
 
@@ -97,6 +105,7 @@ class model
         $this->db->query("INSERT INTO ".$table." ( title, content, users, img) VALUES (title, content, users , img)");
     }
 
+    // Регистрация
     public function signin()
     {
         if(isset($_POST['do_signup']))
@@ -106,6 +115,7 @@ class model
             if(empty($errors))
             {
                 $this->db->execute("INSERT INTO users (name, surname, login, email, password) VALUES ('".$_POST['surname']."','".$_POST['name']."','".$_POST['login']."','".$_POST['email']."','".md5($_POST['password'])."')");
+
                 echo "<div style='color: green;'>Вы успешно зарегистрированы</div>";
             }
             else
@@ -115,6 +125,7 @@ class model
         }
     }
 
+    // Авторизация
     public function login()
     {
         if (isset($_POST['do_login']))
@@ -151,9 +162,9 @@ class model
         }
     }
 
+    // Проверка при регистрации
     public function check()
     {
-        //регистрируем
         $errors = array();
 
         if(trim($_POST['email']==''))
@@ -180,13 +191,14 @@ class model
         {
             $errors[]='Пользователь уже существует';
         }
-
         return $errors;
     }
 
+    // Выход с аккаунта
     public function logout()
     {
         unset($_SESSION['user']);
+
         unset($_SESSION['status']);
 
         header('Location: /');
@@ -211,9 +223,7 @@ class model
 
     public function friends_id()
     {
-        return  $this->db->query("SELECT friend_id FROM friends WHERE user_id='".$_SESSION['id']."'");
-
-
+        return $this->db->query("SELECT friend_id FROM friends WHERE user_id='".$_SESSION['id']."'");
     }
     public function get_friends()
     {
@@ -230,6 +240,10 @@ class model
      return $arr;
     }
 
+    public static function redirect($url)
+    {
+        echo " <script type=\"text/javascript\"> window.location.href='".$url."/".$_GET['id']."'; </script> ";
+    }
 
     public function count_sms()
     {
@@ -245,10 +259,12 @@ class model
     {
         return $this->db->query("INSERT INTO friends (user_id, friend_id) VALUES ('" .$_SESSION['id']. "','".$friend_id."')" );
     }
+
     public function friend_user_id($friend_id)
     {
         return $this->db->query("SELECT img FROM users WHERE id=".$friend_id);
     }
+
     public function select_avatar()
     {
         $this->db->query("SELECT img FROM users ");
