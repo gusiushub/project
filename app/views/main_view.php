@@ -1,9 +1,3 @@
-<?php
-
-
-?>
-
-
 <div class="card mb-3">
     <img height = "500px" class="card-img-top" src="../../files/upload/<?php echo $page[0]['img']; ?>">
     <div class="card-body">

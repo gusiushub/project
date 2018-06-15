@@ -1,12 +1,8 @@
 
 <h2 class="display-4">Регистрация</h2>
-<?php
-if(isset($_POST['do_signup'])) {
-   // session_start();
-    $data->signin('users');
 
-}
-?>
+<?php if(isset($_POST['do_signup'])) { $data->signin('users'); } ?>
+
 <form action="" method="post" style="width: 400px" class=" mx-auto">
     <div  class="form-group ">
         <input name="name" type="text" class="form-control "  aria-describedby="emailHelp" placeholder="Имя" value="<?php echo @$_POST['name'] ?>">

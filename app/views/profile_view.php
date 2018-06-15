@@ -1,45 +1,60 @@
 <?php
-
-if(!empty($_GET['id'])) {
-    $user = $data->get_user_info();
-}
-$articles = $data->get_user_articles();
-
-if(!empty($_POST["do_article"]))
-{
-    if(!empty($_FILES["img"]["name"]))
+    //убрать в модель
+    if(!empty($_GET['id']))
     {
-        $data->insert_img('insert','articles','img','files/upload');
-
-        $data->insert_article();
+        $user = $data->get_user_info();
     }
-    else
+
+    $articles = $data->get_user_articles();
+
+    if(!empty($_POST["do_article"]))
     {
-        $data->insert_article();
-    }
-}
-if(!empty($_POST["sub"])){
-    if(!empty($_FILES["avatar"]["name"])) {
-        $data->insert_img('update','users','avatar', 'files/image/avatar');
-    }
-}
-if(!empty($_POST['addfriend'])){
-    $add = $data->add_friend($_GET['id']);
-}
-$friends_id=$data->friends_id();
+        if(!empty($_FILES["img"]["name"]))
+        {
+            $data->insert_img('insert','articles','img','files/upload');
 
-$i=0;
-foreach ($friends_id as $friend_id){
-    if ($i<5){
-        $q[$i] = $friend_id['friend_id'];
-        $i++;
+            $data->insert_article();
         }
-    $result = (array_unique($q));
-}
+        else
+        {
+            $data->insert_article();
+        }
+    }
 
-$w = array_unique($q);
-$friends = array_unique($result);
+    if(!empty($_POST["sub"]))
+    {
+        if(!empty($_FILES["avatar"]["name"]))
+        {
+            $data->insert_img('update','users','avatar', 'files/image/avatar');
+        }
+    }
+    if(!empty($_POST['addfriend']))
+    {
+        $add = $data->add_friend($_GET['id']);
+    }
 
+    if (!empty($data->friends_id()))
+    {
+        $friends_id = $data->friends_id();
+
+        $i = 0;
+
+        foreach ($friends_id as $friend_id)
+        {
+            if ($i < 5)
+            {
+                $q[$i] = $friend_id['friend_id'];
+
+                $i++;
+            }
+
+            $result = (array_unique($q));
+        }
+
+        $w = array_unique($q);
+
+        $friends = array_unique($result);
+    }
 ?>
 <!-- хлебные крошки -->
 <nav style=" margin-top: 15px;" aria-label="breadcrumb">
@@ -53,8 +68,8 @@ $friends = array_unique($result);
 <!-- меню -->
 <ul class="profilMenu" style="list-style-type: none; float: left; margin-left: 0; width: 200px; ">
 
-    <a href="#"><img style="padding: 0; margin-left: 0;" width="265px" height="270px" src="../../files/image/avatar/<?php echo $user[0]['image'];?>"></a>
-    <li><?php echo "User: ". $user[0]['surname']." ". $user[0]['name']; ?></li>
+    <a href="#"><img style="padding: 0; margin-left: 0;" width="265px" height="270px" src="../../files/image/avatar/<?php echo $user[0]['image'];?>"> </a>
+    <li> <?php echo "User: ". $user[0]['surname']." ". $user[0]['name']; ?> </li>
     <?php if($_SESSION['id']==$_GET['id']){ ?>
     <li><a href="#">Новости</a> </li>
     <li><a href="/user/message">Сообщения</a> ( <?php echo $data->count_sms(); ?> )</li>
@@ -63,12 +78,12 @@ $friends = array_unique($result);
     <li><a href="#">Фото</a> </li>
     <li><a href="#">Аудио</a> </li>
     <li><a href="#">Мои статьи</a> </li>
-        <li><a href="#">Друзья</a>( <?php echo count($friends); ?> ) </li>
+        <li><a href="#">Друзья</a>( <?php if (!empty($data->friends_id())) { echo count($friends); } ?> ) </li>
         <ul>
             <?php //foreach ($friends as $friend){ ?>
                 <li>
                     <div class="media">
-<?php                       //   $img_avatar = $data->friend_user_id($friend[4]);  ?>
+                    <?php //$img_avatar = $data->friend_user_id($friend[4]);  ?>
                         <img width="64px" class="d-flex mr-3" src="../../files/image/avatar/ava.jpg" alt="Generic placeholder image">
                         <div class="media-body">
                             <h5 class="mt-0">Имя пользователя</h5>

@@ -1,5 +1,4 @@
-<?php
-?>
+
 <form action="" method="post" enctype="multipart/form-data">
     <h2>Заголовок</h2>
     <input type="text"> <h4>добавить фото</h4> <input type="file">

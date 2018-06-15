@@ -207,10 +207,10 @@ class model
     public function check_article()
     {
         $errors = array();
-        if($_POST["title_text"]==""){
+        if($_POST["title_text"]==''){
             echo  $errors[]="Введите заголовок";
         }
-        if($_POST["content"]==""){
+        if($_POST["content"]==''){
             echo $errors[]="Введите контент";
         }
         return $errors;
@@ -225,12 +225,14 @@ class model
     {
         return $this->db->query("SELECT friend_id FROM friends WHERE user_id='".$_SESSION['id']."'");
     }
+
     public function get_friends()
     {
         $friends = $this->friends_id();
         foreach ($friends as $friend)
         {
            $user_login[] =  $this->db->query("SELECT login FROM users WHERE id='".$friend['friend_id']."'");
+
             foreach ($user_login as $login){
 
                 $arr[] = $login[0]['login'];

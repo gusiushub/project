@@ -1,4 +1,5 @@
 <?php if( isset($_POST['do_login'])){$data->login();} ?>
+
 <h2 class="display-4">Авторизация</h2>
 <form method="post" action="" style="width: 400px" class=" mx-auto">
     <div  class="form-group ">

@@ -1,4 +1,5 @@
 <?php
+//убрать в модель
 $users = $data->get_users();
 $sms = $data->sms();
 //$get = $data->get_sms();

@@ -2,8 +2,9 @@ PHP MVC Beginners project
 =======================
  
 **This is a training project implemented with the help of MVC. 
-There is implemented in a very simple MVC structure.The foundation 
-of the project is located in the folder with name core**
+There is implemented in a very simple MVC structure, without 
+autoload classes.The foundation of the project is located in 
+the folder with name core**
 ## PHP MVC Beginners project
 **This is a training project implemented with the help of MVC. 
 There is implemented in a very simple MVC structure.The foundation 

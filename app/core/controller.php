@@ -1,6 +1,6 @@
 <?php
 
-class controller
+abstract class controller
 {
     public $model;
 
